@@ -40,10 +40,13 @@ jobs:
 
       - name: Install Android SDK build-tools (AIDL)
         run: |
-          buildozer android 2>&1 | head -30 || true
-          yes | /root/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager \
-            --sdk_root=/root/.buildozer/android/platform/android-sdk \
-            "build-tools;37.0.0" || true
+          buildozer android 2>&1 | head -50 || true
+          SDKMANAGER=$(find ~/.buildozer -name "sdkmanager" -type f 2>/dev/null | head -1)
+          echo "Found sdkmanager: $SDKMANAGER"
+          SDK_ROOT=$(dirname $(dirname $(dirname $SDKMANAGER)))
+          echo "SDK root: $SDK_ROOT"
+          yes | $SDKMANAGER --sdk_root=$SDK_ROOT "build-tools;33.0.0" "platforms;android-33"
+          ls -la $SDK_ROOT/build-tools/
 
       - name: Build debug APK
         run: |
