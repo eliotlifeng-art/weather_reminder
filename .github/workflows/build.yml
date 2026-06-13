@@ -30,31 +30,21 @@ jobs:
         run: |
           pip install buildozer==1.6.0 cython==0.29.37 kivy==2.2.1 kivymd==1.1.1 requests plyer
 
+      - name: Accept Android SDK licenses
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+          echo -e "\nd975f751698a77b662f1254ddbeed3901e976f5a" > ~/.buildozer/android/platform/android-sdk/licenses/intel-android-extra-license
+
       - name: Initialize Buildozer
         run: |
           buildozer init || true
-
-      - name: Set up Android SDK for Buildozer
-        run: |
-          SYSTEM_SDK=/usr/local/lib/android/sdk
-          BUILD_SDK=~/.buildozer/android/platform/android-sdk
-          mkdir -p $BUILD_SDK
-          ln -sf $SYSTEM_SDK/platforms $BUILD_SDK/platforms
-          ln -sf $SYSTEM_SDK/build-tools $BUILD_SDK/build-tools
-          mkdir -p $BUILD_SDK/tools/bin
-          ln -sf $SYSTEM_SDK/cmdline-tools/latest/bin/sdkmanager $BUILD_SDK/tools/bin/sdkmanager
-          ln -sf $SYSTEM_SDK/cmdline-tools/latest/bin/avdmanager $BUILD_SDK/tools/bin/avdmanager
-          echo "=== SDK structure ==="
-          ls -la $BUILD_SDK/
-          ls -la $BUILD_SDK/tools/bin/
-          ls -la $BUILD_SDK/build-tools/
 
       - name: Build debug APK
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
-          export ANDROIDSDK=/usr/local/lib/android/sdk
-          export ANDROID_HOME=/usr/local/lib/android/sdk
           buildozer android debug
         timeout-minutes: 60
 
