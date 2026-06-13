@@ -36,11 +36,18 @@ jobs:
 
       - name: Set up Android SDK for Buildozer
         run: |
-          mkdir -p ~/.buildozer/android/platform/
-          ln -sf /usr/local/lib/android/sdk ~/.buildozer/android/platform/android-sdk
-          ls -la ~/.buildozer/android/platform/android-sdk/
-          ls -la ~/.buildozer/android/platform/android-sdk/cmdline-tools/ 2>/dev/null || true
-          ls -la ~/.buildozer/android/platform/android-sdk/build-tools/ 2>/dev/null || true
+          SYSTEM_SDK=/usr/local/lib/android/sdk
+          BUILD_SDK=~/.buildozer/android/platform/android-sdk
+          mkdir -p $BUILD_SDK
+          ln -sf $SYSTEM_SDK/platforms $BUILD_SDK/platforms
+          ln -sf $SYSTEM_SDK/build-tools $BUILD_SDK/build-tools
+          mkdir -p $BUILD_SDK/tools/bin
+          ln -sf $SYSTEM_SDK/cmdline-tools/latest/bin/sdkmanager $BUILD_SDK/tools/bin/sdkmanager
+          ln -sf $SYSTEM_SDK/cmdline-tools/latest/bin/avdmanager $BUILD_SDK/tools/bin/avdmanager
+          echo "=== SDK structure ==="
+          ls -la $BUILD_SDK/
+          ls -la $BUILD_SDK/tools/bin/
+          ls -la $BUILD_SDK/build-tools/
 
       - name: Build debug APK
         run: |
