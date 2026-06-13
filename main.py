@@ -4,7 +4,6 @@ import sys
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager
 from kivymd.app import MDApp
-from kivymd.theming import ThemeManager
 
 from app.database import Database
 from app.scheduler import ReminderScheduler

@@ -33,18 +33,16 @@ jobs:
       - name: Accept Android SDK licenses
         run: |
           mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          yes | sdkmanager --sdk_root=~/.buildozer/android/platform/android-sdk --licenses || true
           echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
           echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
-          echo -e "\nd975f751698a77b662f1254ddbeed3901e976f5a" > ~/.buildozer/android/platform/android-sdk/licenses/intel-android-extra-license
-
-      - name: Initialize Buildozer
-        run: |
-          buildozer init || true
 
       - name: Build debug APK
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
+          export ANDROIDSDK=~/.buildozer/android/platform/android-sdk
+          export ANDROID_HOME=~/.buildozer/android/platform/android-sdk
           buildozer android debug
         timeout-minutes: 60
 
