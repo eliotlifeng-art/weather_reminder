@@ -25,6 +25,11 @@ jobs:
             autoconf libtool libtool-bin pkg-config zlib1g-dev \
             libncurses-dev libncursesw6 libtinfo6 \
             cmake libffi-dev libssl-dev
+          sudo ln -sf /usr/share/aclocal/libtool.m4 /usr/share/aclocal/ltmain.m4 || true
+          sudo ln -sf /usr/share/aclocal/ltsugar.m4 /usr/share/aclocal/ || true
+          sudo ln -sf /usr/share/aclocal/ltversion.m4 /usr/share/aclocal/ || true
+          sudo ln -sf /usr/share/aclocal/ltoptions.m4 /usr/share/aclocal/ || true
+          ls /usr/share/aclocal/lt*.m4
 
       - name: Install Buildozer and dependencies
         run: |
@@ -54,6 +59,7 @@ jobs:
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
+          export ACLOCAL_PATH="/usr/share/aclocal:$ACLOCAL_PATH"
           buildozer android debug
         timeout-minutes: 60
 
