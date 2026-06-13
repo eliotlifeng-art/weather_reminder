@@ -38,21 +38,24 @@ jobs:
         run: |
           buildozer init || true
 
-      - name: Install Android SDK build-tools (AIDL)
-        run: |
-          buildozer android 2>&1 | head -50 || true
-          SDKMANAGER=$(find ~/.buildozer -name "sdkmanager" -type f 2>/dev/null | head -1)
-          echo "Found sdkmanager: $SDKMANAGER"
-          SDK_ROOT=$(dirname $(dirname $(dirname $SDKMANAGER)))
-          echo "SDK root: $SDK_ROOT"
-          yes | $SDKMANAGER --sdk_root=$SDK_ROOT "build-tools;33.0.0" "platforms;android-33"
-          ls -la $SDK_ROOT/build-tools/
-
       - name: Build debug APK
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
-          buildozer android debug
+          mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools
+          buildozer android debug || {
+            echo "=== First build failed, installing build-tools ==="
+            SDKMANAGER=$(find ~/.buildozer -name "sdkmanager" -type f 2>/dev/null | head -1)
+            if [ -n "$SDKMANAGER" ]; then
+              SDK_ROOT=$(dirname $(dirname $(dirname "$SDKMANAGER")))
+              yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" "build-tools;33.0.0" "platforms;android-33"
+              echo "=== Retrying build ==="
+              buildozer android debug
+            else
+              echo "sdkmanager not found"
+              exit 1
+            fi
+          }
         timeout-minutes: 60
 
       - name: Upload APK artifact
