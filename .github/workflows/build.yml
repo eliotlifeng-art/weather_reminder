@@ -34,24 +34,21 @@ jobs:
         run: |
           buildozer init || true
 
+      - name: Set up Android SDK for Buildozer
+        run: |
+          mkdir -p ~/.buildozer/android/platform/
+          ln -sf /usr/local/lib/android/sdk ~/.buildozer/android/platform/android-sdk
+          ls -la ~/.buildozer/android/platform/android-sdk/
+          ls -la ~/.buildozer/android/platform/android-sdk/cmdline-tools/ 2>/dev/null || true
+          ls -la ~/.buildozer/android/platform/android-sdk/build-tools/ 2>/dev/null || true
+
       - name: Build debug APK
         run: |
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
-          mkdir -p ~/.buildozer/android/platform/android-sdk/build-tools
-          buildozer android debug || {
-            echo "=== First build failed, installing build-tools ==="
-            SDKMANAGER=$(find ~/.buildozer -name "sdkmanager" -type f 2>/dev/null | head -1)
-            if [ -n "$SDKMANAGER" ]; then
-              SDK_ROOT=$(dirname $(dirname $(dirname "$SDKMANAGER")))
-              yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" "build-tools;33.0.0" "platforms;android-33"
-              echo "=== Retrying build ==="
-              buildozer android debug
-            else
-              echo "sdkmanager not found"
-              exit 1
-            fi
-          }
+          export ANDROIDSDK=/usr/local/lib/android/sdk
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          buildozer android debug
         timeout-minutes: 60
 
       - name: Upload APK artifact
