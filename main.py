@@ -7,6 +7,9 @@ from kivymd.app import MDApp
 
 from app.database import Database
 from app.scheduler import ReminderScheduler
+from app.api import WeatherAPI
+from app.advice import generate_notification_text
+from app.notification import send_notification
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KV_DIR = os.path.join(BASE_DIR, "ui", "kv")
@@ -22,6 +25,7 @@ class WeatherReminderApp(MDApp):
         super().__init__(**kwargs)
         self.db = Database()
         self.scheduler = ReminderScheduler(self.db)
+        self.scheduler.set_callback(self._on_reminder)
 
     def build(self):
         self.theme_cls.theme_style = "Light"
@@ -52,6 +56,19 @@ class WeatherReminderApp(MDApp):
 
     def set_default_city(self, city_name):
         self.db.set_default_city(city_name)
+
+    def _on_reminder(self, reminder):
+        city = self.get_default_city()
+        if not city:
+            return
+        api_key = self.db.get_setting("api_key", "")
+        if not api_key:
+            return
+        api = WeatherAPI(api_key)
+        data = api.get_current_weather(city_name=city.get("name"), lat=city.get("lat"), lon=city.get("lon"))
+        current = api.parse_current(data)
+        text = generate_notification_text(current)
+        send_notification("Weather Reminder", text)
 
 
 if __name__ == "__main__":
