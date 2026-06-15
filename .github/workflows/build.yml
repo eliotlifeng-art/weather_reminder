@@ -31,7 +31,7 @@ jobs:
 
       - name: Install Buildozer and dependencies
         run: |
-          pip install buildozer==1.6.0 cython==0.29.37 kivy==2.2.1 kivymd==1.1.1 requests plyer
+          pip install buildozer==1.6.0 cython==3.0.8 kivy==2.2.1 kivymd==1.1.1 requests plyer
 
       - name: Build debug APK (first attempt - downloads SDK)
         id: build1

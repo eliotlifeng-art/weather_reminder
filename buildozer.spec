@@ -8,7 +8,7 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,db
 version = 0.1.0
 
-requirements = python3,cython==0.29.37,kivy==2.2.1,kivymd==1.1.1,requests,plyer
+requirements = python3,cython==3.0.8,kivy==2.2.1,kivymd==1.1.1,requests,plyer
 
 orientation = portrait
 
