@@ -25,8 +25,9 @@ jobs:
             autoconf libtool libtool-bin pkg-config zlib1g-dev \
             libncurses-dev libncursesw6 libtinfo6 \
             cmake libffi-dev libssl-dev liblzma-dev
-          ls /usr/share/aclocal/libtool.m4 && echo "libtool.m4 found" || echo "libtool.m4 missing"
-          grep -c "LT_SYS_SYMBOL_USCORE" /usr/share/aclocal/libtool.m4 || echo "macro not in libtool.m4"
+          echo 'AC_DEFUN([LT_SYS_SYMBOL_USCORE], [false])' | sudo tee /usr/share/aclocal/lt_sys_symbol_uscore.m4
+          ls /usr/share/aclocal/libtool.m4 && echo "libtool.m4 found"
+          grep -c "LT_SYS_SYMBOL_USCORE" /usr/share/aclocal/lt_sys_symbol_uscore.m4 && echo "stub macro installed"
 
       - name: Install Buildozer and dependencies
         run: |
@@ -57,7 +58,7 @@ jobs:
           export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           export PATH=$JAVA_HOME/bin:$PATH
           export ACLOCAL_PATH="/usr/share/aclocal"
-          buildozer android debug 2>&1 | tee build.log; test ${PIPESTATUS[0]} -eq 0
+          buildozer android debug
         timeout-minutes: 60
 
       - name: Upload APK artifact
