@@ -24,11 +24,13 @@ jobs:
             git zip unzip openjdk-17-jdk python3-pip \
             autoconf libtool libtool-bin pkg-config zlib1g-dev \
             libncurses-dev libncursesw6 libtinfo6 \
-            cmake libffi-dev libssl-dev
+            cmake libffi-dev libssl-dev liblzma-dev
           sudo ln -sf /usr/share/aclocal/libtool.m4 /usr/share/aclocal/ltmain.m4 || true
           sudo ln -sf /usr/share/aclocal/ltsugar.m4 /usr/share/aclocal/ || true
           sudo ln -sf /usr/share/aclocal/ltversion.m4 /usr/share/aclocal/ || true
           sudo ln -sf /usr/share/aclocal/ltoptions.m4 /usr/share/aclocal/ || true
+          sudo ln -sf /usr/share/aclocal/lt~obsolete.m4 /usr/share/aclocal/ || true
+          sudo ln -sf /usr/share/aclocal/ltoptions.m4 /usr/share/aclocal/lt_sys_symbol_uscore.m4 || true
           ls /usr/share/aclocal/lt*.m4
 
       - name: Install Buildozer and dependencies
@@ -43,7 +45,7 @@ jobs:
           buildozer android debug || true
         timeout-minutes: 15
 
-      - name: Accept SDK licenses
+      - name: Accept SDK licenses and install build-tools
         run: |
           SDKMANAGER=$(find ~/.buildozer -name "sdkmanager" -type f 2>/dev/null | head -1)
           echo "Found sdkmanager: $SDKMANAGER"
@@ -51,8 +53,8 @@ jobs:
             SDK_ROOT=$(dirname $(dirname $(dirname "$SDKMANAGER")))
             echo "SDK root: $SDK_ROOT"
             yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
-            "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" || true
-            ls -la "$SDK_ROOT/licenses/" || true
+            "$SDKMANAGER" --sdk_root="$SDK_ROOT" "platform-tools" "build-tools;33.0.1" || true
+            ls -la "$SDK_ROOT/build-tools/" || true
           fi
 
       - name: Build debug APK (second attempt - with license accepted)
